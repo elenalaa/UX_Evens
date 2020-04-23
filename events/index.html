@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="./css/style.css" rel="stylesheet">
+    <title>Events</title> //https://eloquentjavascript.net/15_event.html
+</head>
+<body>
+
+<button>Klikkaa mua</button><br/><br/>
+
+<button id="toinen">Klikkaa mua, viittaus funktioon</button><br/><br/>
+
+<a href="https://developer.mozilla.org/">MDN</a>
+
+<script>
+
+    const nappula = document.querySelector('button');
+    const nappula2 = document.querySelector('#toinen');
+
+    // selain kuuntelee taustalla ja kun siinä vaiheessa VASTA KUN klikki tapahtuu,
+    // niin suoritetaan funktio
+    nappula.addEventListener('click', function(evt) {
+        console.log(evt.target);
+        alert('Hei minua klikattiin. Klikattu elementti on: ' + evt.target);
+    });
+
+    // toinen tapa toimia, eli viittauksena
+    function niceAlert(evt) {
+        console.log(evt.type);
+        alert('Ja tässä on toinen tapa kirjoittaa kuuntelija. Event type oli ' + evt.type)
+    }
+
+    nappula2.addEventListener('click', niceAlert); // huom, ei sulkeita niceAlertin jälkeen, koska se ajetaan vasta klikin tapahduttua, jos olis sulkeet, mniin se käynnistyy välittömästi.
+    // nappula2.addEventListener('keydown', niceAlert);
+    // nappula2.addEventListener('mouseup', niceAlert);
+
+    let link = document.querySelector("a");
+
+    link.addEventListener("click", event => {
+        console.log("Nope. You will not go to the MDN page.");
+        event.preventDefault();
+    });
+    </script>
+
+    <h1>Handling Events</h1>
+
+    <a href="https://eloquentjavascript.net/15_event.html" target="_blank">Click this document to activate the handler</a>
+
+    <script>
+
+    window.addEventListener("click", evt => { // click document, get info to console which part of page you clicked
+        console.log(evt.target);
+        console.log("You knocked?");
+    });
+</script>
+
+<h2>Events and DOM nodes</h2>
+
+    <button id="button3">Click me</button>
+    <p>No handler here.</p>
+
+<script>
+
+    const button = document.querySelector('#button3');// click button, log event to console
+    button.addEventListener("click", (evt) => {
+        console.log(evt.target);
+        console.log("Button clicked.");
+    });
+</script>
+
+<button id="button4">Act-once button</button>
+
+<script>
+    // select button, removes a handler.
+    const button4 = document.querySelector('#button4');
+    // funtion to be called
+    function once() {
+        console.log("Done.");
+        button4.removeEventListener("click", once); //after running the function once, remove eventListener from button
+    }
+        button4.addEventListener("click", once);//add eventListener to button and call once()
+</script>
+
+<h2>Event objects</h2>
+
+<button id="button5">Click me any way you want</button>
+<script>
+    const button5 = document.querySelector('#button5'); //object holds additional information about the event
+    button5.addEventListener("mousedown", event => {
+        if (event.button5 == 0) {
+            console.log("Left button");
+        } else if (event.button5 == 1) {
+            console.log("Middle button");
+        } else if (event.button5 == 2) {
+            console.log("Right button");
+        }
+    });
+</script>
+
+<h2>Propagation</h2>
+
+<p>A paragraph with a <button id="button6">button</button>.</p>
+<script>
+    const para = document.querySelector("p");
+    const button6 = document.querySelector('#button4');
+    para.addEventListener("mousedown", () => {
+        console.log("Handler for paragraph.");
+    });
+    button6.addEventListener("mousedown", event => { //When the button is clicked with another mouse button, both handlers will run.
+        console.log("Handler for button.");
+        if (event.button6 == 2) event.stopPropagation();
+    });
+</script>
+
+<button id="buttonA">A</button>
+<button id="buttonB">B</button>
+<button id="buttonC">C</button>
+<script>
+    document.body.addEventListener("click", event => {  //it use the target property to figure out whether
+                                                        // a button was clicked, rather than register individual handlers on all of the buttons.
+        if (event.target.nodeName == "BUTTON") {
+            console.log("Clicked", event.target.textContent);
+        }
+    });
+</script>
+
+<h2>Default actions</h2>
+
+<a id="link" href="https://developer.mozilla.org/">MDN</a>
+<script>
+    const link = document.querySelector('#link');
+    link.addEventListener("click", event => {           // a link that cannot be followed
+        console.log("Nope.");
+        event.preventDefault();
+    });
+</script>
+
+<h2>Key events</h2>
+
+<p>This page turns violet when you hold the V key.</p>
+<script>
+    window.addEventListener("keydown", event => {       // When a key on the keyboard is pressed, your browser fires a "keydown" event.
+                                                        // When it is released, you get a "keyup" event.
+        if (event.key == "v") {
+            document.body.style.background = "violet";
+        }
+    });
+    window.addEventListener("keyup", event => {
+        if (event.key == "v") {
+            document.body.style.background = "";
+        }
+    });
+</script>
+
+<p>Press Control-Space to continue.</p>
+<script>
+    window.addEventListener("keydown", event => {
+        if (event.key == " " && event.ctrlKey) {
+            console.log("Because I just pressed space bar and ctrl at the same time, I see a message: Continuing!");
+        }
+    });
+</script>
+
+<h2>Pointer events</h2>
+
+<h3>Mouse clicks</h3>
+
+<div id="drawable_area">
+    <p>You can now draw in the area under (or on top of) this sentence.</p>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <p>And above (or on top of) this sentence.</p>
+
+</div>
+
+<style>
+    body {
+        height: 200px;
+        background: beige;
+    }
+    .dot {
+        height: 8px; width: 8px;
+        border-radius: 4px; /* rounds corners */
+        background: blue;
+        position: absolute;
+    }
+</style>
+
+<script>
+    const drawHere = document.querySelector('#drawable_area');
+    drawHere.addEventListener("click", event => {
+        const dot = document.createElement("div");
+        dot.className = "dot";
+        dot.style.left = (event.pageX - 4) + "px";
+        dot.style.top = (event.pageY - 4) + "px";
+        document.body.appendChild(dot);
+    });
+</script>
+
+<h2>Mouse motion</h2>
+
+<p>Drag the bar to change its width:</p>
+<div id="bar" style="background: orange; width: 60px; height: 20px">
+</div>
+
+<script>
+    let lastX;                                          // Tracks the last observed mouse X position
+    let bar = document.querySelector('#bar');
+    bar.addEventListener("mousedown", event => {
+        if (event.button == 0) {
+            lastX = event.clientX;
+            window.addEventListener("mousemove", moved);
+            event.preventDefault(); // Prevent selection
+        }
+    });
+
+    function moved(event) {
+        if (event.buttons == 0) {
+            window.removeEventListener("mousemove", moved);
+        } else {
+            let dist = event.clientX - lastX;
+            let newWidth = Math.max(10, bar.offsetWidth + dist);
+            bar.style.width = newWidth + "px";
+            lastX = event.clientX;
+        }
+    }
+</script>
+
+<h2>Touch events</h2>
+
+<!--- here we draw a red circle around the place where our finger touches the screen
+      touchscreens can detect multiple fingers at the same time,
+      these events don’t have a single set of coordinates associated with them --->
+
+<style>
+    dot { position: absolute; display: block;
+          border: 2px solid red; border-radius: 50px;
+          height: 100px; width: 100px; }
+</style>
+<p>Touch this page in the mobile debug mode and there will be a red circle around the pointer.</p>
+<script>
+    function update(event) {
+        for (let dot; dot = document.querySelector("dot");) {
+            dot.remove();
+        }
+        for (let i = 0; i < event.touches.length; i++) {
+            let {pageX, pageY} = event.touches[i];
+            let dot = document.createElement("dot");
+            dot.style.left = (pageX - 50) + "px";
+            dot.style.top = (pageY - 50) + "px";
+            document.body.appendChild(dot);
+        }
+    }
+    window.addEventListener("touchstart", update);
+    window.addEventListener("touchmove", update);
+    window.addEventListener("touchend", update);
+</script>
+
+<h2>Scroll events</h2>
+
+<style>
+    #progress {
+        border-bottom: 2px solid blue;
+        width: 0;
+        position: fixed;
+        top: 0; left: 0;
+    }
+</style>
+<div id="progress"></div>
+<script>
+    // Create some content
+    document.body.appendChild(document.createTextNode(
+        "supercalifragilisticexpialidocious ".repeat(1000)));
+
+    let progressBar = document.querySelector("#progress");
+    window.addEventListener("scroll", () => {
+        let max = document.body.scrollHeight - innerHeight;
+        progressBar.style.width = `${(pageYOffset / max) * 100}%`;
+    });
+</script>
+
+<h2>Focus events</h2>
+<p>Name: <input type="text" data-help="Your full name"></p>
+<p>Age: <input type="text" data-help="Your age in years"></p>
+<p id="help"></p>
+
+<script>
+    let help = document.querySelector("#help");
+    let fields = document.querySelectorAll("input");
+    for (let field of Array.from(fields)) {
+        field.addEventListener("focus", event => {
+            let text = event.target.getAttribute("data-help");
+            help.textContent = text;
+        });
+        field.addEventListener("blur", event => {
+            help.textContent = "";
+        });
+    }
+</script>
+
+
+<h2>Timers</h2>
+
+<p>Debouncing</p>
+<script>
+    let bombTimer = setTimeout(() => {
+        console.log("BOOM!");
+    }, 10500);
+
+    if (Math.random() < 0.5) { // 50% chance
+        console.log("Defused.");
+        clearTimeout(bombTimer);
+    }
+
+    let ticks = 0;
+    let clock = setInterval(() => {
+        console.log("tick", ticks++);
+        if (ticks == 10) {
+            clearInterval(clock);
+            console.log("stop.");
+        }
+    }, 200);
+
+</script>
+
+<h2>Debouncing</h2>
+
+<textarea id="textarea">Type something here...</textarea>
+<script>
+    let textarea = document.querySelector('#textarea');
+    let timeout;
+    textarea.addEventListener("input", () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => console.log("Typed!"), 500);
+    });
+</script>
+
+<p>Here we have a div which shows us the mouse position</p>
+<div id="mousePosition">
+
+    <p></p>
+
+</div>
+
+<script>
+
+    let mouseDiv = document.querySelector('#mousePosition');
+    let scheduled = null;
+    window.addEventListener("mousemove", event => {
+        if (!scheduled) {
+            setTimeout(() => {
+                mouseDiv.innerHTML =
+                    `Mouse at ${scheduled.pageX}, ${scheduled.pageY}`;
+                scheduled = null;
+            }, 250);
+        }
+        scheduled = event;
+    });
+</script>
+
+<h2>Exercises</h2>
+
+<h3>Balloon</h3>
+
+<div id="balloonDom">
+    <p id="balloon">🎈</p>
+</div>
+
+<script>
+
+    //select elements
+    let balloon = document.querySelector('#balloon');
+    let balloonDom = document.querySelector('#balloonDom');
+    //balloon size to 10px
+    balloonDom.style.fontSize = '10px';
+
+    //the grow function
+    function grow() {
+        let size = parseInt(balloonDom.style.fontSize);
+        balloonDom.style.fontSize = size * 1.1 + 'px';
+        console.log(size);
+
+        if (size > 24) {                                                    //if balloon bigger than 24px, explode
+            balloon.innerHTML = '💥';
+
+            window.removeEventListener("keydown", handler_grow);            //after explosion, remove eventListener so that the font size doesnt grow
+            window.removeEventListener("keydown", handler_small);
+
+        }
+    }
+
+    const handler_grow = function(e) {
+        e.preventDefault();
+        if (e.key == "ArrowUp") {
+            grow();
+        }
+    };
+
+    window.addEventListener("keydown", handler_grow);
+
+
+    function smaller() {
+        let size = parseInt(balloonDom.style.fontSize);
+        balloonDom.style.fontSize = size * 0.9 + 'px';
+        console.log(size);
+    }
+
+    const handler_small = function(e) {
+        e.preventDefault();
+        if (e.key == "ArrowDown") {
+            smaller();
+        }
+    };
+
+    window.addEventListener("keydown", handler_small)
+
+</script>
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+</body>
+</html>
